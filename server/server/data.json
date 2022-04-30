@@ -1,19 +1,19 @@
 {
-    "Data":[
-        {
-            "id":"Bitsection",
-            "Name": "Bitsection",
-            "Context": "1. จงใช้วิธี Bitsection เพื่อคำนวนหาค่า sqr(13,4) โดยกำหนดค่าขอบเขตเริ่มต้นระหว่าง 1.5 เเละ 2.0",
-            "Question": [
-                "x^2-14"
-            ]
-        },
-        {
-          "id": "Falseposition",
-          "fx": "1/x-43",
-          "xL": 0.02,
-          "xR": 0.03
-        }]
-  
+  "posts": [
+    {
+      "id": 1,
+      "title": "json-server",
+      "author": "typicode"
+    }
+  ],
+  "comments": [
+    {
+      "id": 1,
+      "body": "some comment",
+      "postId": 1
+    }
+  ],
+  "profile": {
+    "name": "typicode"
   }
-  
+}

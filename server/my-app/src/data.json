@@ -1,0 +1,25 @@
+{
+  "Data":[
+      {
+          "id":"Bitsection",
+          "Name": "Bitsection",
+          "Question": [
+              "(x^4-13)"
+          ],
+          "XL": 1.5,
+          "XR": 2.0
+      },
+      {
+        "id": "Falseposition",
+        "fx": "(1/x-43)",
+        "XL": 0.02,
+        "XR": 0.03
+      },
+      { "id":"one_point position",
+        "fx":  "(1/x-43)",
+        "x": 0
+        
+
+    }]
+
+}
