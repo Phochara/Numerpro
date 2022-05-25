@@ -22,8 +22,14 @@ export default class PersonList extends React.Component {
       }
     }
     componentDidMount() {
-        axios.get(`http://localhost:5000/Data/Falseposition`)
-          .then(res => {
+       console.log(this.props.Token)
+       if(this.props.Token !== ""){
+          axios.get(`http://localhost:5000/Data/Falseposition`,{
+            headers:{
+              Authorization: 'Bearer ' + this.props.Token
+            }
+          })
+            .then(res => {
             const data = res.data;
             console.log(data);
             this.setState({ 
@@ -31,8 +37,9 @@ export default class PersonList extends React.Component {
               username:data.fx,
               XL:data.XL,
               XR:data.XR,
-            });
-        })
+              });
+          })
+       }
     }
     false(){
         var func = this.func

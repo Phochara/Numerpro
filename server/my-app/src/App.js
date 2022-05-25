@@ -1,19 +1,28 @@
-import React from 'react';
-import ReactDOM from 'react-dom';
+import React,{useState} from 'react';
+//import ReactDOM from 'react-dom';
 import 'antd/dist/antd.css';
 import './index.css';
 import { Layout, Menu, Breadcrumb } from 'antd';
 import { UserOutlined, LaptopOutlined, NotificationOutlined } from '@ant-design/icons';
 import Bi from './rule/bisection';
 import False from './rule/false';
+import Cra from './rule/cramer';
 import { Typography, Space } from 'antd';
 import { BrowserRouter as Router, Route, Link, Routes } from 'react-router-dom'
+import axios from 'axios';
 const { Title } = Typography;
 const { SubMenu } = Menu;
 const { Header, Content, Sider } = Layout;
 
 
 function App(){
+  const [Token,setToken] = useState("");
+  //let Token
+  axios.post(`http://localhost:5000/login`,{
+    "email":"reborntent@gmail.com",
+    "password":"caltex09892"
+  }).then(res=>{setToken(res.data.accessToken)})
+  console.log(Token)
   return(
     <Router>
     <Layout>
@@ -37,8 +46,8 @@ function App(){
             <Menu.Item key="3">option3</Menu.Item>
             <Menu.Item key="4">option4</Menu.Item>
           </SubMenu>
-          <SubMenu key="sub2" icon={<LaptopOutlined />} title="subnav 2">
-            <Menu.Item key="5">option5</Menu.Item>
+          <SubMenu key="sub2" icon={<LaptopOutlined />} title="บทที่2">
+            <Menu.Item key="5"><Link to="/Cramer">Cramer_Rule</Link></Menu.Item>
             <Menu.Item key="6">option6</Menu.Item>
             <Menu.Item key="7">option7</Menu.Item>
             <Menu.Item key="8">option8</Menu.Item>
@@ -62,10 +71,13 @@ function App(){
           }}
         >
           < Routes>
-            <Route exact path='/Bitsection' element = {<Bi/>} />
+            <Route exact path='/Bitsection' element = {<Bi Token={Token}/>} />
           </ Routes>
           <Routes>
           <Route exact path='/Falseposition' element = {<False/>} />
+          </Routes>
+          <Routes>
+          <Route exact path='/Cramer' element = {<Cra/>} />
           </Routes>
         </Content>
         

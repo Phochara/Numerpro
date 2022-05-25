@@ -1,178 +1,208 @@
-import React from 'react';
+import React, { Component } from 'react'
 import axios from 'axios';
-import { Button } from 'antd';
-import 'antd/dist/antd.css';
-import TextField, { TextFieldProps } from '@mui/material/TextField';
-import { rightArithShift } from 'mathjs';
-import { LineChart, Line } from 'recharts';
-import {
-  XAxis,
-  YAxis,
-  CartesianGrid,
-  Tooltip,
-  Legend
-} from "recharts";
-const math = require('mathjs')
-const data = [
-  {
-    name: "Page A",
-    uv: 3000,
-    pv: 2500,
-    amt: 1000
-  },
-  {
-    name: "Page B",
-    uv: 3000,
-    pv: 1398,
-    amt: 2210
-  },
-  {
-    name: "Page C",
-    uv: 2000,
-    pv: 9800,
-    amt: 2290
-  },
-  {
-    name: "Page D",
-    uv: 2780,
-    pv: 3908,
-    amt: 2000
-  },
-  {
-    name: "Page E",
-    uv: 1890,
-    pv: 4800,
-    amt: 2181
-  },
-  {
-    name: "Page F",
-    uv: 2390,
-    pv: 3800,
-    amt: 2500
-  },
-  {
-    name: "Page G",
-    uv: 3490,
-    pv: 4300,
-    amt: 2100
-  }]
+import { Button, TextField } from '@mui/material';
+import { LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip, Legend, ResponsiveContainer } from 'recharts';
 
-export default class PersonList extends React.Component {
-  constructor(props){
+
+var dataset = []
+const math = require('mathjs');
+
+export default class Test extends Component {
+  constructor(props) {
     super(props)
-    this.bisec=this.bisec.bind(this)
-    this.func=this.func.bind(this)
-    this.state = {
-      person: [],
-      username: [],
-      check: [],
-      XL: null,
-      XR: null,
-      answer: null
-    }
-  }
-  
-
+    this.cal = this.cal.bind(this)
+    this.bitsection = this.bitsection.bind(this)
+    this.state = { Function: '', XL: null, XR: null , ans: null, iterlatoin: [],Error: []}
+  };
   componentDidMount() {
-    axios.get(`http://localhost:5000/Data/Bitsection`)
+    console.log(this.props.Token)
+    if(this.props.Token !== ""){
+      axios.get(`http://localhost:5000/Data/Bitsection`,{
+        headers:{
+          Authorization: 'Bearer ' + this.props.Token
+        }
+      })
       .then(res => {
         const data = res.data;
-        console.log(data);
+        console.log(data)
         this.setState({ 
-          person:data.id,
-          username:data.Question,
-          XL:data.XL,
-          XR:data.XR,
+            Function:data.Question,
+            XL:data.XL,
+            XR:data.XR,
+            //Text:data.context
         });
       })
-  }
-  bisec(){
-    var func = this.func 
-    var XL = this.state.XL
-    var XR = this.state.XR
-    var M ;
-    let A = 0;
-    M =(XL+XR)/2
-    var err = [];
-    while (Math.abs(M-A)/M>0.000001){
-        var err1 = Math.abs(M-A)/M;
-        err.push(err1)
-        if(func(M)*func(XR)>0){
-            A = XR;
-            XR = M;
-        }
-        else{
-            A = XL;
-            XL = M;
-           
-            
-        }
-        M = (XL+XR)/2
+      .catch(err => {
+        console.error(err)
+      })
     }
-    console.log(M)
-    this.setState({answer:M})
-    this.setState({check:err})
+    
   }
-  func(xx){
-    let x=this.state.username
-    console.log(x)
-    let r = math.evaluate(x, { x: xx })
-    //console.log(r)
-    return r
-  }
+  cal(x){
+    return math.evaluate(this.state.Function, { x: x })
+  };
+  result(){
 
+  };
+  bitsection(){
+    
+    var data = [];
+    data['time'] = []
+    data['xl'] = []
+    data['xr'] = []
+    data['error']=[]
+
+    var cal = this.cal
+    console.log("fx: ",this.state.Function);
+    var xl = Number(this.state.XL)
+    var xr = Number(this.state.XR)
+    var ErrorA = [];
+    var iter = [];
+    var time = 0;
+    var eps = 0.00001
+    var xmn ;
+    console.log("xl: ",xl,"xr: ",xr)
+
+    var xmn = (xl + xr) / 2;
+    if (cal(xmn) * cal(xr) > 0) {
+      xr = xmn
+    }
+    else if (cal(xmn) * cal(xr) < 0) {
+        xl = xmn
+    }
+    else {
+      return
+    }
+
+    data['time'][time] = time
+    data['xl'][time] = xl
+    data['xr'][time] = xr
+    data['error'][time] = 0
+
+    while (true) {
+      time = time + 1 
+      var xmo = xmn
+      xmn = (xl + xr) / 2
+      if (cal(xmn) * cal(xr) > 0) {
+          xr = xmn
+          console.log("Root of equation is " , xmn);
+          console.log("Iterlation " , time);
+          iter.push(xmn)
+
+      }
+      if (cal(xmn) * cal(xr) < 0) {
+          xl = xmn
+          console.log("Root of equation is " , xmn);
+          console.log("Iterlation " , time);
+          iter.push(xmn)
+        
+      }
+
+      var err = Math.abs((xmn - xmo) / xmn)
+      
+      data['time'][time] = time
+      data['xl'][time] = xl
+      data['xr'][time] = xr
+      data['error'][time] = Math.abs((xmn - xmo) / xmn)
+      ErrorA.push(err);
+      if(err <= eps) {
+        iter.push(xmn)
+        console.log("Ans Root of equation is " , xmn);
+        console.log("Iterlation " , time);
+        this.setState({ ans: xmn })
+        ErrorA.push(err);
+        data['time'][time] = time
+        data['xl'][time] = xl
+        data['xr'][time] = xr
+        data['error'][time] = Math.abs((xmn - xmo) / xmn)
+        break
+      }
+
+    }
+    this.createdataset(data['time'], data['xl'], data['xr'],data['error'])
+    this.setState({ iterlatoin: iter })
+    this.setState({ Error: ErrorA })
+  };
+
+  createdataset(time,xl,xr,error){
+    dataset = []
+    for(var i = 0; i < xl.length; i++){
+      dataset.push({
+        time: time[i],
+        xl: xl[i],
+        xr: xr[i],
+        error: error[i],
+      })
+    }
+  };
+  
   render() {
-    return (
-      <div>
+    
+    return(
+      <div style={{ width: '100%' }}>
+        <br></br>
+        <TextField 
+            label="Function"
+            onChange={(ip) => {
+            this.setState({Function:ip.target.value})
+            this.forceUpdate()}}
+            value={this.state.Function}
+            name="FUNCTION"
+            />
+        <h1></h1>
         <TextField
-          id="outlined-number"
-          label="Number"
-          type="number"
-          InputLabelProps={{
-            shrink: true,
-          }}
-          onChange={(e) => {this.setState({ XL: e.target.value })
-          this.forceUpdate()}}
-          value={this.state.XL}
-          placeholder="XL"
+            id="outlined-number"
+            label="XL"
+            type="number"
+            InputLabelProps={{
+              shrink: true,
+            }}
+            onChange={(e) => {this.setState({ XL: e.target.value })
+            this.forceUpdate()}}value={this.state.XL}
+            placeholder="XL"
         />
-        <ul></ul>
+
+        <p></p>
         <TextField
-          id="outlined-number"
-          label="Number"
-          type="number"
-          InputLabelProps={{
-            shrink: true,
-          }}
-          onChange={(e) => {this.setState({ XR: e.target.value })
-          this.forceUpdate()}}
-          value={this.state.XR}
-          placeholder="XR"
-        />
-        <ul></ul>
-        <TextField label="Filled success" variant="filled" color="success" focused value={this.state.username} />
-        <ul></ul>
-        <Button type="primary" onClick={this.bisec}>Answer</Button>
-        <ul></ul>
+            id="outlined-number"
+            label="XR"
+            type="number"
+            InputLabelProps={{
+              shrink: true,
+            }}
+            onChange={(ip) => {
+            this.setState({ XR: ip.target.value })
+            this.forceUpdate()}}
+            value={this.state.XR}
+            name="XR"
+            placeholder="XR"
+          />
+        <h1></h1>
+        <Button
+        
+          variant="contained" onClick={this.bitsection}>Submit
+        </Button>
+        <h1></h1>
+        
         <TextField
-          id="outlined-number"
-          label="Number"
-          type="number"
-          InputLabelProps={{
-            shrink: true,
-          }}
-          value={this.state.answer}
-        />
-        <ul></ul>
-        <Button type="ghost" onClick={() => {
-        console.info("Ans: ",this.state.iterlatoin,"Error: ",this.state.check)
-        }}>Check</Button>
-        <ul></ul>
-        <LineChart
-        width={500}
-        height={300}
-        data={data}
-        margin={{
+            id="outlined-number"
+            label="ans"
+            InputLabelProps={{
+              shrink: true,
+            }}
+            value={this.state.ans}
+            placeholder="ans"
+          />
+          <ul></ul>
+          <Button color="inherit" onClick={() => {
+        console.info({dataset})
+      }}>เช็คError</Button>
+
+      <LineChart
+      width={800}
+      height={500}
+      data={dataset}
+      margin={{
         top: 5,
         right: 30,
         left: 20,
@@ -180,17 +210,42 @@ export default class PersonList extends React.Component {
       }}
     >
       <CartesianGrid strokeDasharray="3 3" />
-      <XAxis dataKey="name" />
+      <XAxis dataKey="time" />
       <YAxis />
       <Tooltip />
       <Legend />
       <Line
         type="monotone"
-        dataKey="pv"
+        dataKey="xl"
         stroke="#8884d8"
         activeDot={{ r: 8 }}
       />
-      <Line type="monotone" dataKey="uv" stroke="#82ca9d" />
+      <Line type="monotone" dataKey="xr" stroke="#82ca9d" />
+    </LineChart>
+
+    <LineChart
+      width={800}
+      height={500}
+      data={dataset}
+      margin={{
+        top: 5,
+        right: 30,
+        left: 20,
+        bottom: 5
+      }}
+    >
+      <CartesianGrid strokeDasharray="3 3" />
+      <XAxis dataKey="time" />
+      <YAxis />
+      <Tooltip />
+      <Legend />
+      <Line
+        type="monotone"
+        dataKey="error"
+        stroke="#8884d8"
+        activeDot={{ r: 8 }}
+      />
+      
     </LineChart>
       </div>
     )
