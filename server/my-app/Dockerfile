@@ -1,5 +1,5 @@
 # ทุกครั้งที่ build 
-FROM node:15-alpine 
+FROM node:16
 # node run บนรีนุค version 15-alpine
 WORKDIR /app
 # สร้าง directior(สร้างFolderแล้วเข้าไปในนั้นเลย)+ทำงานใน(cd /app) /app

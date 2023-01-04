@@ -1,0 +1,221 @@
+{
+  "openapi": "3.0.1",
+  "info": {
+    "title": "api Numer",
+    "description": "defaultDescription",
+    "version": "0.1"
+  },
+  "servers": [
+    {
+      "url": "http://localhost:8000"
+    }
+  ],
+  "paths": {
+    "/login": {
+      "post": {
+        "description": "Auto generated using Swagger Inspector",
+        "requestBody" :{
+          "content" :{
+            "application/json" : {
+              "schema" :{
+               "login_body":{
+                 "type": "object",
+                 "properties" : {
+                   "password" :{
+                     "type": "string"
+                   },
+                   "email": {
+                     "type":"string"
+                   }
+                 }
+               }
+              },
+              "examples":{
+                "0" : {
+                  "value" : "{\"email\": \"reborntent@gmail.com\",\"password\": \"caltex09892\"}"
+                }
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "description": "Auto generated using Swagger Inspector",
+            "content": {
+              "application/json": {
+                "examples": {
+                  "1": {
+                   
+                  }
+                }
+              }
+            }
+          }
+        },
+        "security":[
+          {
+             "bearerAuth" : [] 
+          }
+        ],
+        "servers": [
+          {
+            "url": "http://localhost:5000"
+          }
+        ]
+      },
+      "servers": [
+        {
+          "url": "http://localhost:5000"
+        }
+      ]
+    },
+    "/Data/Bitsection": {
+      "get": {
+        "description": "Auto generated using Swagger Inspector",
+        "responses": {
+          "200": {
+            "description": "Auto generated using Swagger Inspector",
+            "content": {
+              "application/json": {
+                "examples": {
+                  "1": {
+                    "value": "{\"id\": \"Bisection\",\"context\": \"จงใช้วิธี Bisection เพื่อคำนวนหาค่า sqr(13,4) โดยกำหนดค่าขอบเขตเริ่มต้นระหว่าง 1.5 เเละ 2.0\",\"fx\": \"(x^2)-14\",\"xl\": 1.5,\"xr\": 2}"
+                  }
+                }
+              }
+            }
+          }
+        },
+        "security":[
+          {
+             "bearerAuth" : [] 
+          }
+        ],
+        "servers": [
+          {
+            "url": "http://localhost:5000"
+          }
+        ]
+      },
+      "servers": [
+        {
+          "url": "http://localhost:5000"
+        }
+      ]
+    },
+    "/Data/Falseposition": {
+      "get": {
+        "description": "Auto generated using Swagger Inspector",
+        "responses": {
+          "200": {
+            "description": "Auto generated using Swagger Inspector",
+            "content": {
+              "application/json; charset=utf-8": {
+                "examples": {
+                  "1":{
+                    "value": "{\"id\":\"Falseposition\", \"fx\":\"1/x-43\", \"xL\":\"0.02\", \"xR\":\"0.03\"}"
+                  }
+                }
+              }
+            }
+          }
+        },
+        "security":[
+          {
+             "bearerAuth" : [] 
+          }
+        ],
+        "servers": [
+          {
+            "url": "http://localhost:5000"
+          }
+        ]
+      },
+      "servers": [
+        {
+          "url": "http://localhost:5000"
+        }
+      ]
+    },
+    "/Data/Onepoint": {
+      "get": {
+        "description": "Auto generated using Swagger Inspector",
+        "responses": {
+          "200": {
+            "description": "Auto generated using Swagger Inspector",
+            "content": {
+              "application/json; charset=utf-8": {
+                "examples": {
+                  "1":{
+                    "value": "{\"id\":\"Onepoint\", \"fx\":\"(1-(x*0.15))/1.85\", \"x\":\"0\"}"
+                  }
+                }
+              }
+            }
+          }
+        },
+        "security":[
+          {
+             "bearerAuth" : [] 
+          }
+        ],
+        "servers": [
+          {
+            "url": "http://localhost:5000"
+          }
+        ]
+      },
+      "servers": [
+        {
+          "url": "http://localhost:5000"
+        }
+      ]
+    },
+    "/Data/Cramer": {
+      "get": {
+        "description": "Auto generated using Swagger Inspector",
+        "responses": {
+          "200": {
+            "description": "Auto generated using Swagger Inspector",
+            "content": {
+              "application/json; charset=utf-8": {
+                "examples": {
+                  "1":{
+                    "value": "{\"id\":\"Cremer\", \"col\":\"3\", \"row\":\"3\"}"
+                  }
+                }
+              }
+            }
+          }
+        },
+        "security":[
+          {
+             "bearerAuth" : [] 
+          }
+        ],
+        "servers": [
+          {
+            "url": "http://localhost:5000"
+          }
+        ]
+      },
+      "servers": [
+        {
+          "url": "http://localhost:5000"
+        }
+      ]
+    }
+  },
+
+  
+  "components": {
+    "schemas": {},
+    "securitySchemes": {
+      "bearerAuth": {
+        "type": "http",
+        "scheme" : "bearer",
+        "bearerFormat" : "JWT"
+      }
+    }
+  }
+}

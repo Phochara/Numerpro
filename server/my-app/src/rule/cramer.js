@@ -1,178 +1,259 @@
-import React, {Component} from 'react'
-import axios from 'axios';
-import { Card } from 'antd';
-import Button from '@mui/material/Button';
-import TextField from '@mui/material/TextField';
-import Box from '@mui/material/Box';
-const math = require('mathjs');
-var dataset = [];
-var A = [], B = [], answer = [], matrixA = [], matrixB = []
-export default class Test extends Component {
-    constructor(props){
-        super(props)
-        this.buildmatrix = this.buildmatrix.bind(this)
-        this.creat = this.creat.bind(this)
-        this.Matrix = this.Matrix.bind(this)
-        this.state = {
-            Text:'',
-            A:null,
-            B:null,
-            matrixa:[],
-            matrixb:[],
-            col:null,
-            row:null,
-            answer:null,
-            showMatrixFrom:false
-        }
-    };
-    componentDidMount(){
-        axios.get('http://localhost:5000/api/cramer').then(res=>{
-            const data = res.data;
-            console.log(data);
-            this.setState({
-                Text:data.context,
-                A:data.A,
-                col:data.col,
-                row:data.row
-            })
-            this.buildmatrix()
-            for (var i = 0; i < this.state.row; i++) {
-                for (var j = 0; j < this.state.col; j++) {
-                    document.getElementById('a' + (i + 1) + '' + (j + 1)).value =
-                        data.A[i][j]
-                    document.getElementById('b' + (i + 1)).value =
-                        data.B[i][0]
-                }
-            }
-        })
-    };
-    buildmatrix(){
-        let row = this.state.row
-        let col = this.state.col
-        matrixA = []
-        matrixB = []
-        for(var i = 1 ; i <= row ; i++){
-            for(var j = 1 ; j <= col ; j++){
-                matrixA.push(
-                    <TextField
-                        type="Matrix"
-                        label={"a" + i + "" + j}
-                        id={"a" + i + "" + j} key={"a" + i + "" + j} placeholder={"a" + i + "" + j}
-                    />
-                )
-            }
-            matrixA.push(<Box/>)
-            matrixB.push(<TextField
-                type="number"
-                label={"b" + i + "" + j}
-                id={"b" + i} key={"b" + i} placeholder={"b" + i}/>)
-                matrixB.push(<Box/>)
-        }
-        this.setState({showMatrixFrom:true})
-    }
-    Matrix(){
-        for(var i = 0; i < this.state.row;i++){
-            A[i] = []
-            for (var j = 0 ; j < this.state.col; j++){
-                A[i][j] = parseFloat(
-                    document.getElementById('a' + (i+1) + '' + (j+1) ).value
-                )
-            }
-            B[i] = []
-            B[i].push(parseFloat(document.getElementById('b' + (i+1)).value))
-        }
-        console.log('Matrix')
-    }
-    cal(){
-        var data = []
-        data['x'] = []
-        console.log(A)
-        console.log(B)
-        var a = math.matrix(A)
-        var b = math.matrix(B)
-        for (let i = 0; i < a.size()[0]; i++) {
-            data['x'].push(
-                math.round(
-                    math.det(
-                        math.subset(
-                            a,
-                            math.index(math.range(0, a.size()[0]), i),
-                            math.subset(
-                                b,
-                                math.index(math.range(0, a.size()[0]), 0)
-                            )
-                        )
-                    )
-                ) / math.round(math.det(a))
-            )
-        }
-    }
-    creat(){
-        this.Matrix()
-        this.cal()
-        console.log('submit')
-    }
-    render(){
-        return(
-            <div>
-                <div>
-                    <div>
-                        <TextField
-                            id="outlined-number"
-                            label="ROW"
-                            type="Matrix"
-                            InputLabelProps={{
-                                shrink: true,
-                            }}
-                            onChange={async (e) => {
-                                await this.setState({
-                                    row: e.target.value,
-                                })
-                            }}
-                            value={this.state.row}
-                            name="Row"
-                            placeholder="Row"
-                        />
-                        <TextField
-                            id="outlined-number"
-                            label="COLUMN"
-                            type="Matrix"
-                            InputLabelProps={{
-                                shrink: true,
-                            }}
-                            onChange={async (e) => {
-                                await this.setState({
-                                    col: e.target.value,
-                                })
-                            }}
-                            value={this.state.col}
-                            name="Column"
-                            placeholder="Dimension"
-                        />
-                        <Button
-                             variant="contained" onClick={this.buildmatrix}>Submit
-                        </Button>        
-                    </div>
-                    <br/>
-                    <Button variant="inherit"  onClick={() => {console.info({dataset}," col: ",this.state.col," row:  ",this.state.row,this.state.matrixA)}}>console.log</Button>
-                    <br/>
-                    <Card className="col">
-                        {
-                            this.state.showMatrixFrom &&
-                            <div>
-                                <h2>Matrix [A]</h2> <br/>{matrixA}<br/>
-                                <h2>Vector [B]</h2> <br/>{matrixB}<br/>
-                            </div>
+import React, { Component } from "react";
+import "antd/dist/antd.css";
+import { Card, Input, Button, Table } from "antd";
+import { addStyles, EditableMathField } from "react-mathquill";
+const AlgebraLatex = require("algebra-latex");
+const math = require("mathjs");
 
-                        }
-                        
-                </Card>
-                <br/>
-                <Button
-                    variant="contained" onClick={this.creat}>Submit
-                </Button>
-                </div>
-            </div>
-        )
+addStyles();
+
+var dataInTable = [];
+const columns = [
+  {
+    title: "Iteration",
+    dataIndex: "iteration",
+    key: "iteration",
+  },
+  {
+    title: "X",
+    dataIndex: "x",
+    key: "x",
+  },
+];
+
+var A = [],
+  B = [],
+  answer = [],
+  matrixA = [],
+  matrixB = [];
+
+export default class Test extends Component {
+  constructor(props) {
+    super(props);
+    this.bi = this.bi.bind(this);
+    this.Ex = this.Ex.bind(this);
+    this.createTable = this.createTable.bind(this);
+    this.initMatrix = this.initMatrix.bind(this);
+    this.state = { Dimension: null, chDi: false };
+  }
+  //API
+  async Ex() {
+    const url = "http://localhost:5000/Data/Cramer";
+    const response = await fetch(url);
+    console.log(response);
+    const data = await response.json();
+    console.log(data);
+    this.setState({
+      Dimension: data.col,
+    });
+    this.createMatrix(this.state.Dimension, this.state.Dimension);
+
+    for (var i = 0; i < this.state.Dimension; i++) {
+      for (var j = 0; j < this.state.Dimension; j++) {
+        document.getElementById("a" + (i + 1) + "" + (j + 1)).value =
+          data.A[i][j];
+        document.getElementById("b" + (i + 1)).value = data.B[i][0];
+      }
     }
+  }
+
+  componentDidMount() {
+    //ทำอัตโนมัติหลังจาก render เสร็จ
+  }
+
+  initMatrix() {
+    for (var i = 0; i < this.state.Dimension; i++) {
+      A[i] = [];
+      for (var j = 0; j < this.state.Dimension; j++) {
+        A[i][j] = parseFloat(
+          document.getElementById("a" + (i + 1) + "" + (j + 1)).value
+        );
+      }
+      B[i] = [];
+      B[i].push(parseFloat(document.getElementById("b" + (i + 1)).value));
+    }
+    console.log("initMatrix");
+  }
+
+  cal() {
+    var data = [];
+    data["x"] = [];
+    console.log(A);
+    console.log(B);
+    var a = math.matrix(A);
+    var b = math.matrix(B);
+    for (let i = 0; i < a.size()[0]; i++) {
+      data["x"].push(
+        math.round(
+          math.det(
+            math.subset(
+              a,
+              math.index(math.range(0, a.size()[0]), i),
+              math.subset(b, math.index(math.range(0, a.size()[0]), 0))
+            )
+          )
+        ) / math.round(math.det(a))
+      );
+    }
+    this.createTable(data["x"]);
+  }
+
+  bi() {
+    this.initMatrix();
+    this.cal();
+    // this.createTable(data["x"]);
+    console.log("submit");
+  }
+
+  createTable(x) {
+    dataInTable = [];
+    for (var i = 0; i < x.length; i++) {
+      dataInTable.push({
+        iteration: "X" + i,
+        x: x[i],
+      });
+    }
+    this.forceUpdate();
+  }
+
+  createMatrix(row, column) {
+    matrixA = [];
+    matrixB = [];
+    console.log(row + " " + column);
+    for (var i = 1; i <= row; i++) {
+      for (var j = 1; j <= column; j++) {
+        matrixA.push(
+          <Input
+            style={{
+              width: "15%",
+              height: "50%",
+              backgroundColor: "black",
+              marginInlineEnd: "5%",
+              marginBlockEnd: "5%",
+              color: "white",
+              fontSize: "18px",
+              fontWeight: "bold",
+            }}
+            id={"a" + i + "" + j}
+            key={"a" + i + "" + j}
+            placeholder={"a" + i + "" + j}
+          />
+        );
+      }
+      matrixA.push(<br />);
+      matrixB.push(
+        <Input
+          style={{
+            width: "15%",
+            height: "50%",
+            backgroundColor: "black",
+            marginInlineEnd: "5%",
+            marginBlockEnd: "5%",
+            color: "white",
+            fontSize: "18px",
+            fontWeight: "bold",
+          }}
+          id={"b" + i}
+          key={"b" + i}
+          placeholder={"b" + i}
+        />
+      );
+      matrixB.push(<br />);
+    }
+    this.setState({ chDi: true });
+    console.log(matrixA);
+  }
+
+  render() {
+    return (
+      <div>
+        <h1>Cramer's Rule</h1>
+        <div className="row">
+          <div className="col">
+            <div>
+              <p>Dimension</p>
+              <Input
+                onChange={async (e) => {
+                  await this.setState({ Dimension: e.target.value });
+                  this.createMatrix(this.state.Dimension, this.state.Dimension);
+                  this.forceUpdate();
+                  //   console.log(this.state.Dimension);
+                }}
+                value={this.state.Dimension}
+                name="Dimension"
+                placeholder="Dimension"
+              />
+              <br></br>
+              <br></br>
+              <Button onClick={this.bi} type="primary">
+                Submit
+              </Button>
+              <Button
+                style={{
+                  marginLeft: "50%",
+                  backgroundColor: "#76D7C4",
+                  borderColor: "#76D7C4",
+                }}
+                onClick={this.Ex}
+                type="primary"
+              >
+                Example
+              </Button>
+            </div>
+            <br></br>
+          </div>
+          <div className="col">
+            {this.state.chDi && (
+              <div
+                style={{
+                  textAlign: "right",
+                }}
+              >
+                <h2>Input Matrix A</h2>
+                {matrixA}
+              </div>
+            )}
+          </div>
+          <div className="col">
+            {this.state.chDi && (
+              <div>
+                <h2>Input Matrix B</h2>
+                {matrixB}
+              </div>
+            )}
+          </div>
+        </div>
+        <br></br>
+        <br></br>
+        {/* {this.state.ans.map((data, i) => {
+          return (
+            <p>
+              Iteration No.{i + 1} Root of equation is {data}
+            </p>
+          );
+        })} */}
+        <Card
+          title={"Output"}
+          bordered={true}
+          style={{
+            width: "100%",
+            background: "#2196f3",
+            color: "#FFFFFFFF",
+          }}
+          id="outputCard"
+        >
+          <Table
+            pagination={{ defaultPageSize: 5 }}
+            columns={columns}
+            dataSource={dataInTable}
+            bodyStyle={{
+              fontWeight: "bold",
+              fontSize: "18px",
+              color: "black",
+            }}
+          ></Table>
+        </Card>
+      </div>
+    );
+  }
 }
